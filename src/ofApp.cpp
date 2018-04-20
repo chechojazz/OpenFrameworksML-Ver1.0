@@ -74,7 +74,7 @@ void ofApp::update(){
         ofxOscMessage sendMsg;
         ofxOscMessage sendControl;
         
-        sendMsg.setAddress("/wek/outputs");
+        sendMsg.setAddress("/wek/outputs/");
         receiver.getNextMessage(msg);
         
         if(msg.getAddress()=="/wek/inputs"){
@@ -142,15 +142,21 @@ void ofApp::update(){
                         sendMsg.addFloatArg(senderOutput[n]);
                     }
                     else{
-                        sendMsg.addFloatArg(0);
+                        sendMsg.addFloatArg(0.f);
                     }
-                    sender.sendMessage(sendMsg);
-                    cout << "enviando modelo número " << n << "  por osc, valor: " <<senderOutput[n] << endl;
+                    
+                    cout << "enviando modelo número " << n << endl;
 //                    cout << senderOutput.size() << endl;
 //                    for (int i = 0; i <= 4; i++){
 //                        cout << senderOutput[i] << endl;
 //                    }
                 }
+                //if (sendMsg.getNumArgs()==0) {
+                cout<< "numArg:"<<sendMsg.getArgAsString(0) <<"\n";
+                //}else{
+                sender.sendMessage(sendMsg);
+
+                //}
             }
         }
         
