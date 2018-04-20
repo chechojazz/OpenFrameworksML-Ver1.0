@@ -7,6 +7,7 @@
 
 #include "utils.hpp"
 #include "NeuralNetworks.hpp"
+//#include "ofxOsc.h"
 
 using namespace std;
 using namespace cv;
@@ -29,6 +30,8 @@ void saveDataRecorded(Mat &data, vector<Mat> &label, vector<float> &features, ve
 
 void createTrainData(vector<vector<Mat>> dataVecMat, vector<vector<Mat>> labelVecMat, vector<bool> modelsAct,vector<bool> methodAct ,vector<Ptr<TrainData>>& trainDataOfModels){
     
+    
+    
     cout << "Recorded data is transforming to training data..." <<endl;
     //    cout << methodAct[0] << endl;
     //    cout << methodAct[1] << endl;
@@ -40,6 +43,7 @@ void createTrainData(vector<vector<Mat>> dataVecMat, vector<vector<Mat>> labelVe
         if(modelsAct[n]==1){
             if( (dataVecMat[n].empty()==true) || (labelVecMat[n].empty()==true) ){
                 cout << "Data/label matrix " << n+1 << " is empty, cannot train." << endl;
+                
             }else{
                 for(int m = 0; m<=dataVecMat[n].size()-1; ++m){
                     auxForTrainData.push_back(dataVecMat[n][m]);

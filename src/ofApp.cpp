@@ -1,4 +1,5 @@
 #include "ofApp.h"
+
 // ---------- NUM OF FEATURES --------------------------
 int numFeatures = 58;
 
@@ -71,6 +72,7 @@ void ofApp::update(){
         
         ofxOscMessage msg;
         ofxOscMessage sendMsg;
+        ofxOscMessage sendControl;
         
         sendMsg.setAddress("/wek/outputs");
         receiver.getNextMessage(msg);
@@ -254,6 +256,8 @@ void ofApp::update(){
                             }else{
                                 trainWithANN(ann[n], trainDataOfModels[n]);
                                 cout << "training Done!" << endl;
+                                sendControl.setAddress("/control/wekTrainFinish");
+                                sender.sendMessage(sendControl);
                             }
                         }
                     }
