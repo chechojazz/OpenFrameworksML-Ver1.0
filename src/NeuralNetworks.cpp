@@ -32,11 +32,21 @@ void trainWithANN(Ptr<ANN_MLP>& ann,Ptr<TrainData>& trainData){
 
 float predictWithANN(Ptr<ANN_MLP>& ann,vector<float> featuresToPredictWith){
     
-    Mat featuresMat,result;
+    int size = featuresToPredictWith.size();
+    Mat featuresMat(size,1, CV_32F),result;
+    
     float probFloat;
     
-    featuresMat.push_back(featuresToPredictWith); //????
-    featuresMat.convertTo(featuresMat, CV_32F);
+    //featuresMat.push_back(featuresToPredictWith); //????
+    //cout<<"t:"<<featuresMat.type()<<"\nd:"<<featuresMat.depth()<<"\n";//to debug
+    //featuresMat.convertTo(featuresMat, CV_32F);
+    
+    
+    for(int i = 0; i < size; i++) {
+        featuresMat.at<float>(i,0) = featuresToPredictWith[i];
+    }
+    
+
 //    cout << featuresMat.t() << endl;
     
     if (ann.empty()){
