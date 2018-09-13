@@ -58,11 +58,14 @@ vector<bool> boolVecMethodsActive={boolLogisticRegression,boolSVM,boolANN}; // W
 
 //  ----------------------------- Send Output Vector of floats  -----------------------------
 vector<float> senderOutput = {0,0,0,0,0};
+//------------cout Flags---------------
+int flag1 = -1;
+
 
 //--------------------------------------------------------------
 void ofApp::setup(){
     receiver.setup(6448);
-    sender.setup("localhost", 12000);
+    sender.setup("localhost", 6666);
 }
 
 //--------------------------------------------------------------
@@ -130,12 +133,12 @@ void ofApp::update(){
                 for (int n = 0; n <= boolVecModelsActive.size()-1; n++){
                     if (boolVecModelsActiveRunning[n]==1){
                         lrPrediction = predictWithLR(lr[n],featuresViolinRT);
-                        cout << lrPrediction << endl;
+                        //cout << lrPrediction << endl;
                     }
                 }
             }
             if (boolVecMethodsActive[2] == 1){ //ANN
-                cout << "Running with ANN " << endl;
+                //cout << "Running with ANN " << endl;
                 for (int n = 0; n <= boolVecModelsActive.size()-1; n++){
                     if (boolVecModelsActiveRunning[n] == 1){
                         senderOutput[n] = predictWithANN(ann[n], featuresViolinRT);
@@ -145,14 +148,14 @@ void ofApp::update(){
                         sendMsg.addFloatArg(0.f);
                     }
                     
-                    cout << "enviando modelo número " << n << endl;
+                    //cout << "enviando modelo número " << n << endl;
 //                    cout << senderOutput.size() << endl;
 //                    for (int i = 0; i <= 4; i++){
 //                        cout << senderOutput[i] << endl;
 //                    }
                 }
                 //if (sendMsg.getNumArgs()==0) {
-                cout<< "numArg:"<<sendMsg.getArgAsString(0) <<"\n";
+                //cout<< "numArg:"<<sendMsg.getArgAsString(0) <<"\n";
                 //}else{
                 sender.sendMessage(sendMsg);
 
@@ -161,7 +164,10 @@ void ofApp::update(){
         }
         
         if ((startRecording == 1) && (msg.getAddress()=="/wek/inputs")){ //No guardamos vectores llenos de 0 sino solo cuando el pitch es detectado!!!!!SOLO GUARDA SI HAY PITCH Y ESTA EN MODO REC!!     //DEPRECATED (msg.getAddress()=="/wekinator/control/outputs")){ //data asíncrona!!!
-            cout << "Grabando" << endl;
+            if (flag1 != 1){//not printed once
+                cout << "Grabando" << endl;
+                flag1 = 1;
+            }
             saveDataRecorded(dataMatrix, labelMatrix, featuresViolinRT, isSoundGood,boolVecModelsActive);
         }
         
@@ -232,7 +238,7 @@ void ofApp::update(){
                                     cout << "Train " << n+1 << " go wrong or not trained" << endl;
                                 }else{
                                     cout << "training " << n << " ok" << endl;
-                                    cout << thetas[n] << endl;
+                                    //cout << thetas[n] << endl;
                                 }
                             }
                         }
@@ -384,8 +390,8 @@ void ofApp::keyPressed(int key){
     }
     if (key == '2'){
         
-        cout << ann[4]->getWeights(4) << endl;
-        cout << ann[3]->getWeights(4) << endl;
+        //cout << ann[4]->getWeights(4) << endl;
+        //cout << ann[3]->getWeights(4) << endl;
         
     }
     if (key == '3'){

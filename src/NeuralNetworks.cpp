@@ -59,7 +59,7 @@ float predictWithANN(Ptr<ANN_MLP>& ann,vector<float> featuresToPredictWith){
             const char* err_msg = e.what();
             cout << err_msg << endl; //Per mirar lerror!!
         }
-        cout << result << endl;
+        //cout << result << endl;
         
         probFloat = result.at<float>(0, 1);
         return probFloat;
