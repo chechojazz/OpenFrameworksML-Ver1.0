@@ -63,7 +63,7 @@ vector<float> senderOutput = {0,0,0,0,0};
 //--------------------------------------------------------------
 void ofApp::setup(){
     receiver.setup(6448);
-    sender.setup("localhost", 12000);
+    sender.setup("localhost", 6666);
 }
 
 //--------------------------------------------------------------

@@ -1,6 +1,6 @@
 #pragma once
 
-//#include "ofMain.h"
+#include "ofMain.h"
 #include "ofxOsc.h"
 #include "logisticRegression.hpp"
 #include "SVM.hpp"
@@ -8,6 +8,10 @@
 #include "utils.hpp"
 #include <string>
 #include <opencv2/opencv.hpp>
+//#include "ofBaseApp.h"
+
+//#ifndef OFBASEAPP_H
+//#define OFBASEAPP_H
 
 class ofApp : public ofBaseApp{
     
