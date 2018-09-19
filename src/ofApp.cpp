@@ -74,8 +74,9 @@ void ofApp::update(){
         
         ofxOscMessage msg;
         ofxOscMessage sendMsg;
+        ofxOscMessage sendControl;
         
-        sendMsg.setAddress("/wek/outputs");
+        sendMsg.setAddress("/wek/outputs/");
         receiver.getNextMessage(msg);
         
         if(msg.getAddress()=="/wek/inputs"){
@@ -228,6 +229,7 @@ void ofApp::update(){
                                 }else{
                                     cout << "training " << n << " ok" << endl;
                                     cout << thetas[n] << endl;
+                                    sendControl.setAddress("/control/wekTrainFinish");
                                 }
                             }
                         }
@@ -243,6 +245,7 @@ void ofApp::update(){
                             }else{
                                 svmVectors[n] = trainWithSVM(svm, trainDataOfModels[n]); // TODO!!! fer que es pugui triar quins models entrenar
                                 cout <<"Support Vectors: " << svmVectors[n] << endl;
+                                sendControl.setAddress("/control/wekTrainFinish");
                             }
                         }
                     }
@@ -260,6 +263,9 @@ void ofApp::update(){
                             }
                         }
                     }
+                    sendControl.setAddress("/control/wekTrainFinish");
+                    sender.sendMessage(sendControl);
+                    cout << "training Done Fag sent" << endl;
                 }
             }
         }

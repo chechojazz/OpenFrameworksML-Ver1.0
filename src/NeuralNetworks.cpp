@@ -32,12 +32,24 @@ void trainWithANN(Ptr<ANN_MLP>& ann,Ptr<TrainData>& trainData){
 
 float predictWithANN(Ptr<ANN_MLP>& ann,vector<float> featuresToPredictWith){
     
+    /* This code throws an error of Assertion failed (func !=0), I have commented and added a solution, which is next.
     Mat featuresMat,result;
     float probFloat;
     
     featuresMat.push_back(featuresToPredictWith); //????
     featuresMat.convertTo(featuresMat, CV_32F);
 //    cout << featuresMat.t() << endl;
+     */
+    
+    int size = featuresToPredictWith.size();
+    Mat featuresMat(size,1, CV_32F),result;
+    
+    float probFloat;
+    
+    for(int i = 0; i < size; i++) {
+        featuresMat.at<float>(i,0) = featuresToPredictWith[i];
+    }
+
     
     if (ann.empty()){
         cout << "ERROR empty ANN" << endl;
