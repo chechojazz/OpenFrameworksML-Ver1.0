@@ -278,16 +278,35 @@ void ofApp::update(){
             }
             cout << "All examples are delated" << endl;
         }
-        if(msg.getAddress() == "/wekinator/control/wekSave"){
+        
+        if (std::strncmp(msg.getAddress().c_str(),"/wekinator/control/wekSave/", strlen("/wekinator/control/wekSave/") ) == 0 )
+        {
+            //get the path (first argument before the first comma)
+            std::string message (msg.getAddress().c_str());
+            std::size_t comma_pos = message.find(",");
+            std::size_t lenOfctrMsg = strlen("/wekinator/control/wekSave/");
+            std::string pathAndFileName = message.substr(lenOfctrMsg, comma_pos - lenOfctrMsg);
             
-            vector<ofFile> vectorOfFiles = {firstModel,secondModel,thirdModel,fourthModel,fifthModel};
-            saveDataRecordedToLocalMemory(vectorOfFiles, modelsData, modelsLabel);
+            //Get the parameters: remaining of the message after the first comma
+            
+            std::stringstream controlStrParam (message.substr(comma_pos + 1));//get the string after last '/' character
+            std::string segment;//define temp variable segment
+            std::vector<std::string> paramlist;//define vector where the list of parameters (strings) will be allocated
+            
+            while(std::getline(controlStrParam, segment, ','))//look for delimiter
+            {
+                paramlist.push_back(segment);//store found word at delimiter.
+            }
+            
+            vector<ofFile> vectorOfFiles = {firstModel,secondModel,thirdModel,fourthModel,fifthModel};//Create a vector of files
+            saveDataRecordedToLocalMemory(vectorOfFiles, modelsData, modelsLabel, paramlist, pathAndFileName);//record data on each file
             cout << "[Recorded Data] - Recorded Data storage process is finished." << endl;
             
-            saveTrainedData(ann);
-            cout << "[Ann Files Parameters] - Training Data storage process is finished." << endl;
+            saveTrainedData(ann, paramlist, pathAndFileName);
             
+            cout << "[Ann Files Parameters] - Training Data storage process is finished." << endl;
         }
+
         
         if(msg.getAddress() == "/wekinator/control/wekLoad"){
             loadTrainingData(ann);
@@ -312,12 +331,12 @@ void ofApp::draw(){
 void ofApp::keyPressed(int key){
     
     if(key == 's'){
-        vector<ofFile> vectorOfFiles = {firstModel,secondModel,thirdModel,fourthModel,fifthModel};
-        saveDataRecordedToLocalMemory(vectorOfFiles, modelsData, modelsLabel);
-        cout << "[Recorded Data] - Recorded Data storage process is finished." << endl;
-        
-        saveTrainedData(ann);
-        cout << "[Ann Files Parameters] - Training Data storage process is finished." << endl;
+//        vector<ofFile> vectorOfFiles = {firstModel,secondModel,thirdModel,fourthModel,fifthModel};
+//        saveDataRecordedToLocalMemory(vectorOfFiles, modelsData, modelsLabel,paramlist);
+//        cout << "[Recorded Data] - Recorded Data storage process is finished." << endl;
+//        
+//        saveTrainedData(ann, paramlist);
+//        cout << "[Ann Files Parameters] - Training Data storage process is finished." << endl;
     }
     
     if(key == 'r'){

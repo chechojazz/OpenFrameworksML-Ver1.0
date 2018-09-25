@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "saveTrainedData(std::__1::vector&lt;cv::Ptr&lt;cv::ml::ANN_MLP&gt;, std::__1::allocator&lt;cv::Ptr&lt;cv::ml::ANN_MLP&gt; &gt; &gt;, std::__1::vector&lt;std::__1::basic_string&lt;char, std::__1::char_traits&lt;char&gt;, std::__1::allocator&lt;char&gt; &gt;, std::__1::allocator&lt;std::__1::basic_string&lt;char, std::__1::char_traits&lt;char&gt;, std::__1::allocator&lt;char&gt; &gt; &gt; &gt;):utils.cpp">
+      </ContextState>
+      <ContextState
+         contextName = "saveDataRecordedToLocalMemory(std::__1::vector&lt;ofFile, std::__1::allocator&lt;ofFile&gt; &gt;, std::__1::vector&lt;std::__1::vector&lt;cv::Mat, std::__1::allocator&lt;cv::Mat&gt; &gt;, std::__1::allocator&lt;std::__1::vector&lt;cv::Mat, std::__1::allocator&lt;cv::Mat&gt; &gt; &gt; &gt;, std::__1::vector&lt;std::__1::vector&lt;cv::Mat, std::__1::allocator&lt;cv::Mat&gt; &gt;, std::__1::allocator&lt;std::__1::vector&lt;cv::Mat, std::__1::allocator&lt;cv::Mat&gt; &gt; &gt; &gt;, std::__1::vector&lt;std::__1::basic_string&lt;char, std::__1::char_traits&lt;char&gt;, std::__1::allocator&lt;char&gt; &gt;, std::__1::allocator&lt;std::__1::basic_string&lt;char, std::__1::char_traits&lt;char&gt;, std::__1::allocator&lt;char&gt; &gt; &gt; &gt;):utils.cpp">
+      </ContextState>
+      <ContextState
+         contextName = "saveTrainedData(std::__1::vector&lt;cv::Ptr&lt;cv::ml::ANN_MLP&gt;, std::__1::allocator&lt;cv::Ptr&lt;cv::ml::ANN_MLP&gt; &gt; &gt;, std::__1::vector&lt;std::__1::basic_string&lt;char, std::__1::char_traits&lt;char&gt;, std::__1::allocator&lt;char&gt; &gt;, std::__1::allocator&lt;std::__1::basic_string&lt;char, std::__1::char_traits&lt;char&gt;, std::__1::allocator&lt;char&gt; &gt; &gt; &gt;, std::__1::basic_string&lt;char, std::__1::char_traits&lt;char&gt;, std::__1::allocator&lt;char&gt; &gt;):utils.cpp">
+      </ContextState>
+      <ContextState
+         contextName = "ofApp::update():ofApp.cpp">
+         <PersistentStrings>
+            <PersistentString
+               value = "strlen(&quot;/wekinator/control/wekSave/&quot;)">
+            </PersistentString>
+            <PersistentString
+               value = "comma_pos - lenOfctrMsg">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "predictWithANN(cv::Ptr&lt;cv::ml::ANN_MLP&gt;&amp;, std::__1::vector&lt;float, std::__1::allocator&lt;float&gt; &gt;):NeuralNetworks.cpp">
+      </ContextState>
+      <ContextState
+         contextName = "saveDataRecordedToLocalMemory(std::__1::vector&lt;ofFile, std::__1::allocator&lt;ofFile&gt; &gt;, std::__1::vector&lt;std::__1::vector&lt;cv::Mat, std::__1::allocator&lt;cv::Mat&gt; &gt;, std::__1::allocator&lt;std::__1::vector&lt;cv::Mat, std::__1::allocator&lt;cv::Mat&gt; &gt; &gt; &gt;, std::__1::vector&lt;std::__1::vector&lt;cv::Mat, std::__1::allocator&lt;cv::Mat&gt; &gt;, std::__1::allocator&lt;std::__1::vector&lt;cv::Mat, std::__1::allocator&lt;cv::Mat&gt; &gt; &gt; &gt;):utils.cpp">
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>

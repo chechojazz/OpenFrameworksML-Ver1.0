@@ -85,15 +85,15 @@ void createTrainData(vector<vector<Mat>> dataVecMat, vector<vector<Mat>> labelVe
     }
 }
 
-void saveDataRecordedToLocalMemory(vector<ofFile> vectorOfFiles,vector<vector<Mat>> modelsData, vector<vector<Mat>> modelsLabel){    //save recorded data to local memory directory
+void saveDataRecordedToLocalMemory(vector<ofFile> vectorOfFiles,vector<vector<Mat>> modelsData, vector<vector<Mat>> modelsLabel, vector<string> paramlist, string pathAndFileName){    //save recorded data to local memory directory
+    
     
     for(int numModels = 0; numModels < vectorOfFiles.size(); ++numModels){
         
         using boost::filesystem::path;
         
-        String nameModel = "dataModelNumber";
-        nameModel = nameModel + std::to_string(numModels);
-        nameModel = nameModel + ".csv";
+        String nameModel = pathAndFileName + "_" + paramlist.at(numModels) + ".csv";//here the number will be changed by the dimension name
+        //nameModel = nameModel + ".csv";
         path pathname(nameModel);
         
         vectorOfFiles[numModels].open(pathname,ofFile::WriteOnly);
@@ -120,18 +120,20 @@ void saveDataRecordedToLocalMemory(vector<ofFile> vectorOfFiles,vector<vector<Ma
     }
 }
 
-void saveTrainedData(vector<Ptr<ANN_MLP>> ann){
+void saveTrainedData(vector<Ptr<ANN_MLP>> ann, vector<string> paramlist, string pathAndFileName){
     
     using boost::filesystem::path;
     
-    char * dir = getcwd(NULL, 0); // Platform-dependent, see reference link below
-    printf("[Ann Files Parameters] - Files are going to be saved in:  %s \n", dir);
+    //char * dir = getcwd(NULL, 0); // Platform-dependent, see reference link below
+    cout<< "[Ann Files Parameters] - Files are going to be saved in:" << pathAndFileName << '\n';
     
     for(int i = 0; i < ann.size(); i++){
         
-        String nameModel = "annParameters";
-        nameModel = nameModel + std::to_string(i+1);
-        nameModel = nameModel + ".xml";
+        //String nameModel = paramlist.at(numModels) + ".csv";//here the number will be changed by the dimension name
+
+        
+        String nameModel = pathAndFileName + "_" + paramlist.at(i) + ".xml";;//here the number should be changed by the dimension name
+        
         path pathname(nameModel);
         
         FileStorage fs;
