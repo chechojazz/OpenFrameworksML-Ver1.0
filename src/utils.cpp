@@ -130,7 +130,7 @@ void saveTrainedData(vector<Ptr<ANN_MLP>> ann, vector<string> paramlist, string 
     for(int i = 0; i < ann.size(); i++){
         
         //String nameModel = paramlist.at(numModels) + ".csv";//here the number will be changed by the dimension name
-
+        
         
         String nameModel = pathAndFileName + "_" + paramlist.at(i) + ".xml";;//here the number should be changed by the dimension name
         
@@ -153,28 +153,15 @@ void saveTrainedData(vector<Ptr<ANN_MLP>> ann, vector<string> paramlist, string 
         }
     }
 }
-void loadTrainingData(vector<Ptr<ANN_MLP>>& ann){
+void loadTrainingData(vector<Ptr<ANN_MLP>>& ann, string pathAndFileName, string strModelNum){
     
-    //Open the Open File Dialog
-    ofFileDialogResult openFileResult= ofSystemLoadDialog("Select a XML File");
-    
-    //Check if the user opened a file
-    if (openFileResult.bSuccess){
-        
-        //We have a file, check it and process it
-        processOpenFileSelection(openFileResult,ann);
-        
-    }else {
-        cout <<"[Load Training from Doc] - User hit cancel" << endl;;
-    }
-}
-
-void processOpenFileSelection(ofFileDialogResult openFileResult,vector<Ptr<ANN_MLP>>& ann){
-    
+    using boost::filesystem::path;
     //    ofLogVerbose("getName(): "  + openFileResult.getName());
     //    ofLogVerbose("getPath(): "  + openFileResult.getPath());
     
-    ofFile file (openFileResult.getPath());
+    path pathname(pathAndFileName);
+    
+    ofFile file (pathname);
     
     if (file.exists()){
         
@@ -183,34 +170,27 @@ void processOpenFileSelection(ofFileDialogResult openFileResult,vector<Ptr<ANN_M
         
         if(fileExtension == "XML"){
             
-            FileStorage opencv_file(openFileResult.getPath(), FileStorage::READ);
+            FileStorage opencv_file(pathAndFileName, FileStorage::READ);
             
             Ptr<ANN_MLP> nn = ANN_MLP::create();
             nn->read(opencv_file.root());
             
-            cout << openFileResult.getName()<< endl;
+            cout << pathAndFileName<< endl;
             
-            char lastCharName = openFileResult.getName().at(openFileResult.getName().length() - 5);
             
-            if (isdigit(lastCharName) == true){
-                
-                int numberModelInt = lastCharName-48;
-                if((numberModelInt < 6) && (numberModelInt > 0)){
-                    
-                    ann[numberModelInt - 1] = nn;
-                    cout << "[Load Training from Doc] - Model number "<< numberModelInt <<" updated." << endl;
-                    
-                }else{
-                    cout << "[Load Training from Doc] - Models from 1 to 5" << endl;
-                }
-            }else{
-                cout << "[Load Training from Doc] - Please specify the model number in the name of the file 'modelAnnNumber_.xml'; e.g. 'modelAnnNumber1.xml'" << endl;
-            }
+            
+            int numberModelInt = stoi(strModelNum);
+            //if((numberModelInt < 6) && (numberModelInt > 0)){
+            
+            ann[numberModelInt] = nn;
+            cout << "[Load Training from Doc] - Model number "<< numberModelInt <<" updated." << endl;
             opencv_file.release();
-        }else{
+        }
+        else{
             cout << "[Load Training from Doc] - The extension must be .xml and the structure in accordance with the OpenCV storage document." << endl;
         }
     }
 }
+
 
 

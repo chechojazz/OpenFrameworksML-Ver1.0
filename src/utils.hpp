@@ -26,7 +26,6 @@ void createTrainData(vector<vector<Mat>> dataVecMat, vector<vector<Mat>> labelVe
 //Storage process
 void saveDataRecordedToLocalMemory(vector<ofFile> vectorOfFiles, vector<vector<Mat>> modelsData, vector<vector<Mat>> modelsLabel, vector<string> paramlist, string pathAndFileName); //save recorded data to local memory directory
 void saveTrainedData(vector<Ptr<ANN_MLP>> ann, vector<string> paramlist, string pathAndFileName);
-void loadTrainingData(vector<Ptr<ANN_MLP>>& ann);
-void processOpenFileSelection(ofFileDialogResult openFileResult,vector<Ptr<ANN_MLP>>& ann);
+void loadTrainingData(vector<Ptr<ANN_MLP>>& ann, string pathAndFileName, string strModelNum);
 
 #endif /* utils_hpp */

@@ -307,9 +307,23 @@ void ofApp::update(){
             cout << "[Ann Files Parameters] - Training Data storage process is finished." << endl;
         }
 
-        
-        if(msg.getAddress() == "/wekinator/control/wekLoad"){
-            loadTrainingData(ann);
+        if (std::strncmp(msg.getAddress().c_str(),"/wekinator/control/wekLoad", strlen("/wekinator/control/wekLoad") ) == 0 )
+        {
+            //get the path (first argument before the comma)
+            std::string message (msg.getAddress().c_str());
+            std::size_t comma_pos = message.find(",");
+            std::size_t lenOfctrMsg = strlen("/wekinator/control/wekLoad/");
+            std::string pathAndFileName = message.substr(lenOfctrMsg, comma_pos - lenOfctrMsg);
+            
+            //Get the parameter (i.e. the model number): remaining of the message after the comma
+            
+            std::string modelNum_str (message.substr(comma_pos + 1));//get the string after last ',' character
+            
+            loadTrainingData(ann, pathAndFileName, modelNum_str);
+            //send control after model has been loaded
+            //sendControl.setAddress("/control/wekTrainFinish");
+            //sender.sendMessage(sendControl);
+            
         }
     }
 }
