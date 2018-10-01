@@ -1,12 +1,13 @@
 #include "ofApp.h"
 
+
 // ---------- NUM OF FEATURES --------------------------
 int numFeatures = 58;
 
 // ----------------- DATA INPUT ---------------------
 Mat dataMatrix, recorded;
 vector<Mat> labelMatrix(5);
-vector<vector<Mat>> modelsData(5),modelsLabel(5); //Number of models
+vector<vector<Mat>> modelsData(5), modelsLabel(5); //Number of models
 vector<float> isSoundGood(5);
 vector<float> featuresViolinRT(numFeatures); // wek/inputs
 vector<Mat> thetas(5);
@@ -40,8 +41,8 @@ vector<Ptr<ANN_MLP>> ann(5);
 
 //-----------ModelsActivatedRecording(Save data!!!)----------------------
 
-vector<int> modelsActivated(5);
-vector<int> modelsDesactivated(5);
+vector<int> modelsActivated(5); // Only for data converting purpose
+vector<int> modelsDesactivated(5); // Only for data converting purpose
 vector<int> auxModelAct(5);
 int numModelsActivated = 5; //Models 1, 2, 3, 4, 5 - DEFAULT VIOLINRT
 vector<bool> boolVecModelsActive={1,1,1,1,1}; // Which models are activated to record
@@ -58,9 +59,6 @@ vector<bool> boolVecMethodsActive={boolLogisticRegression,boolSVM,boolANN}; // W
 
 //  ----------------------------- Send Output Vector of floats  -----------------------------
 vector<float> senderOutput = {0,0,0,0,0};
-//------------cout Flags---------------
-int flag1 = -1;
-
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -70,6 +68,7 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    ofSetLogLevel(OF_LOG_VERBOSE);
     
     while(receiver.hasWaitingMessages()){
         
@@ -92,7 +91,7 @@ void ofApp::update(){
         if(msg.getAddress()=="/wekinator/control/outputs"){ // Labels de cada frame para cada modelo, isSoundGood tiene size 5 por los 5 modelos
             for (int j = 0; j <= isSoundGood.size()-1; ++j){
                 isSoundGood[j] = msg.getArgAsFloat(j);
-//                              cout << isSoundGood[j] << endl;
+                //                              cout << isSoundGood[j] << endl;
             }
         }
         if (msg.getAddress()=="/wekinator/control/startRecording"){
@@ -133,41 +132,32 @@ void ofApp::update(){
                 for (int n = 0; n <= boolVecModelsActive.size()-1; n++){
                     if (boolVecModelsActiveRunning[n]==1){
                         lrPrediction = predictWithLR(lr[n],featuresViolinRT);
-                        //cout << lrPrediction << endl;
+                        cout << lrPrediction << endl;
                     }
                 }
             }
             if (boolVecMethodsActive[2] == 1){ //ANN
-                //cout << "Running with ANN " << endl;
+                cout << "Running with ANN " << endl;
                 for (int n = 0; n <= boolVecModelsActive.size()-1; n++){
                     if (boolVecModelsActiveRunning[n] == 1){
                         senderOutput[n] = predictWithANN(ann[n], featuresViolinRT);
                         sendMsg.addFloatArg(senderOutput[n]);
                     }
                     else{
-                        sendMsg.addFloatArg(0.f);
+                        sendMsg.addFloatArg(0);
                     }
-                    
-                    //cout << "enviando modelo número " << n << endl;
-//                    cout << senderOutput.size() << endl;
-//                    for (int i = 0; i <= 4; i++){
-//                        cout << senderOutput[i] << endl;
-//                    }
+                    sender.sendMessage(sendMsg);
+                    cout << "enviando modelo número " << n << "  por osc, valor: " <<senderOutput[n] << endl;
+                    //                    cout << senderOutput.size() << endl;
+                    //                    for (int i = 0; i <= 4; i++){
+                    //                        cout << senderOutput[i] << endl;
+                    //                    }
                 }
-                //if (sendMsg.getNumArgs()==0) {
-                //cout<< "numArg:"<<sendMsg.getArgAsString(0) <<"\n";
-                //}else{
-                sender.sendMessage(sendMsg);
-
-                //}
             }
         }
         
         if ((startRecording == 1) && (msg.getAddress()=="/wek/inputs")){ //No guardamos vectores llenos de 0 sino solo cuando el pitch es detectado!!!!!SOLO GUARDA SI HAY PITCH Y ESTA EN MODO REC!!     //DEPRECATED (msg.getAddress()=="/wekinator/control/outputs")){ //data asíncrona!!!
-            if (flag1 != 1){//not printed once
-                cout << "Grabando" << endl;
-                flag1 = 1;
-            }
+            cout << "Grabando" << endl;
             saveDataRecorded(dataMatrix, labelMatrix, featuresViolinRT, isSoundGood,boolVecModelsActive);
         }
         
@@ -238,7 +228,8 @@ void ofApp::update(){
                                     cout << "Train " << n+1 << " go wrong or not trained" << endl;
                                 }else{
                                     cout << "training " << n << " ok" << endl;
-                                    //cout << thetas[n] << endl;
+                                    cout << thetas[n] << endl;
+                                    sendControl.setAddress("/control/wekTrainFinish");
                                 }
                             }
                         }
@@ -254,6 +245,7 @@ void ofApp::update(){
                             }else{
                                 svmVectors[n] = trainWithSVM(svm, trainDataOfModels[n]); // TODO!!! fer que es pugui triar quins models entrenar
                                 cout <<"Support Vectors: " << svmVectors[n] << endl;
+                                sendControl.setAddress("/control/wekTrainFinish");
                             }
                         }
                     }
@@ -268,137 +260,69 @@ void ofApp::update(){
                             }else{
                                 trainWithANN(ann[n], trainDataOfModels[n]);
                                 cout << "training Done!" << endl;
-                                sendControl.setAddress("/control/wekTrainFinish");
-                                sender.sendMessage(sendControl);
                             }
                         }
                     }
+                    sendControl.setAddress("/control/wekTrainFinish");
+                    sender.sendMessage(sendControl);
+                    cout << "training Done Fag sent" << endl;
                 }
             }
+        }
+        if(msg.getAddress()=="/wekinator/control/deleteAllExamples"){
+            
+            for (int n = 0; n < modelsData.size(); n++){
+                modelsData[n].clear(); // Clear data saved
+                modelsLabel[n].clear(); // Clear labels saved
+                ann[n].release(); // Clear trainning set saved for ANN only!
+            }
+            cout << "All examples are delated" << endl;
+        }
+        if(msg.getAddress() == "/wekinator/control/wekSave"){
+            
+            vector<ofFile> vectorOfFiles = {firstModel,secondModel,thirdModel,fourthModel,fifthModel};
+            saveDataRecordedToLocalMemory(vectorOfFiles, modelsData, modelsLabel);
+            cout << "[Recorded Data] - Recorded Data storage process is finished." << endl;
+            
+            saveTrainedData(ann);
+            cout << "[Ann Files Parameters] - Training Data storage process is finished." << endl;
+            
+        }
+        
+        if(msg.getAddress() == "/wekinator/control/wekLoad"){
+            loadTrainingData(ann);
         }
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    ofDrawBitmapStringHighlight("peak " + ofToString(peak, 7), 50, 30);
-    ofDrawBitmapStringHighlight("label " + ofToString(freq, 7), 50, 50);
-    ofDrawBitmapStringHighlight("label " + ofToString(label, 7), 50, 70);
-    ofDrawBitmapStringHighlight("Grabando " + ofToString(startRecording, 7), 50, 90);
-    ofDrawBitmapStringHighlight("SVM " + ofToString(boolSVM, 7), 50, 110);
-    ofDrawBitmapStringHighlight("LR " + ofToString(boolLogisticRegression, 7), 50, 130);
     
-    ofDrawBitmapStringHighlight("Model 1 Activated: " + ofToString(boolVecModelsActive[0], 7), 50, 150);
-    ofDrawBitmapStringHighlight("Model 2 Activated: " + ofToString(boolVecModelsActive[1], 7), 50, 170);
-    ofDrawBitmapStringHighlight("Model 3 Activated: " + ofToString(boolVecModelsActive[2], 7), 50, 190);
-    ofDrawBitmapStringHighlight("Model 4 Activated: " + ofToString(boolVecModelsActive[3], 7), 50, 210);
-    ofDrawBitmapStringHighlight("Model 5 Activated: " + ofToString(boolVecModelsActive[4], 7), 50, 230);
+    ofDrawBitmapStringHighlight("Machine Learning OSC for ViolinRT", 50, 20);
     
-    ofDrawBitmapStringHighlight("s to save the record", 400, 100);
-    ofDrawBitmapStringHighlight("b to save models to CSV files", 400, 150);
-    ofDrawBitmapStringHighlight("t to train", 400, 200);
     
+    ofDrawBitmapStringHighlight("Model 1 Activated: " + ofToString(boolVecModelsActive[0], 7), 10, 50);
+    ofDrawBitmapStringHighlight("Model 2 Activated: " + ofToString(boolVecModelsActive[1], 7), 10, 70);
+    ofDrawBitmapStringHighlight("Model 3 Activated: " + ofToString(boolVecModelsActive[2], 7), 10, 90);
+    ofDrawBitmapStringHighlight("Model 4 Activated: " + ofToString(boolVecModelsActive[3], 7), 10, 110);
+    ofDrawBitmapStringHighlight("Model 5 Activated: " + ofToString(boolVecModelsActive[4], 7), 10, 130);
     
 }
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     
-    if(key=='b'){ //TODO fer que num models es faci amb boolVec models!!!!!!!
+    if(key == 's'){
+        vector<ofFile> vectorOfFiles = {firstModel,secondModel,thirdModel,fourthModel,fifthModel};
+        saveDataRecordedToLocalMemory(vectorOfFiles, modelsData, modelsLabel);
+        cout << "[Recorded Data] - Recorded Data storage process is finished." << endl;
         
-        //        firstModel.open("firstDataLabelModel.csv",ofFile::WriteOnly);
-        //        secondModel.open("secondDataLabelModel.csv",ofFile::WriteOnly);
-        //        thirdModel.open("thirdDataLabelModel.csv",ofFile::WriteOnly);
-        //        fourthModel.open("fourthDataLabelModel.csv",ofFile::WriteOnly);
-        //        fifthModel.open("fifthDataLabelModel.csv",ofFile::WriteOnly);
-        
-        for(int numModels = 0; numModels <= boolVecModelsActive.size()-1; ++numModels){
-            if(boolVecModelsActive[numModels]==1)
-            {
-                if (numModels == 0) {
-                    firstModel.open("firstDataLabelModel.csv",ofFile::WriteOnly);
-                }
-                if (numModels == 1) {
-                    secondModel.open("secondDataLabelModel.csv",ofFile::WriteOnly);
-                }
-                if (numModels == 2) {
-                    thirdModel.open("thirdDataLabelModel.csv",ofFile::WriteOnly);
-                }
-                if (numModels==3) {
-                    fourthModel.open("fourthDataLabelModel.csv",ofFile::WriteOnly);
-                }
-                if (numModels==4) {
-                    fifthModel.open("fifthDataLabelModel.csv",ofFile::WriteOnly);
-                }
-            }
-        } //TODO FER TOT AIXO AMB EL BOOLSVEC!! I MIRAR SI FUNCIONA BÉ!!!! 22-2-18
-        for(int numModels = 0; numModels <= 4; ++numModels){
-            
-            if(modelsData[numModels].empty()==false){
-                for (int numSavedData = 0; numSavedData<=modelsData[numModels].size()-1; ++numSavedData ){
-                    for (int n = 0; n<=modelsData[numModels][numSavedData].rows-1;++n){
-                        
-                        for (int m = 0; m <= modelsData[numModels][numSavedData].cols-1;++m){ //NO ES POT FER MILLOR CREC! AFAIK
-                            if( (modelsActivated[numModels]==1) || (numModelsActivated==5) ){ //POSEM numModelsActivated == 5 perque si fem la impresio directament de la data sense manipulars els models no tenim iniciats els vectors, VIolinRT te el cinc models iniciats per defecte!
-                                firstModel << modelsData[numModels][numSavedData].at<float>(n,m) << " , " ;
-                            }
-                            if((modelsActivated[numModels]==2) || (numModelsActivated==5)){
-                                secondModel << modelsData[numModels][numSavedData].at<float>(n,m) << " , " ;
-                            }
-                            if((modelsActivated[numModels]==3) || (numModelsActivated==5)){
-                                thirdModel << modelsData[numModels][numSavedData].at<float>(n,m) << " , " ;
-                            }
-                            if((modelsActivated[numModels]==4) || (numModelsActivated==5)){
-                                fourthModel << modelsData[numModels][numSavedData].at<float>(n,m) << " , " ;
-                            }
-                            if((modelsActivated[numModels]==5) || (numModelsActivated==5)){
-                                fifthModel << modelsData[numModels][numSavedData].at<float>(n,m) << " , " ;
-                            }
-                        }
-                        if((modelsActivated[numModels]==1) || (numModelsActivated==5)){
-                            firstModel << modelsLabel[numModels][numSavedData].at<float>(n,0); // (n,0) -> 0 Perque sol te una columna
-                            firstModel << "\n";
-                        }
-                        if((modelsActivated[numModels]==2) || (numModelsActivated==5)){
-                            secondModel << modelsLabel[numModels][numSavedData].at<float>(n,0); // (n,0) -> 0 Perque sol te una columna
-                            secondModel << "\n";
-                        }
-                        if((modelsActivated[numModels]==3) || (numModelsActivated==5)){
-                            thirdModel << modelsLabel[numModels][numSavedData].at<float>(n,0); // (n,0) -> 0 Perque sol te una columna
-                            thirdModel << "\n";
-                        }
-                        if((modelsActivated[numModels]==4) || (numModelsActivated==5)){
-                            fourthModel << modelsLabel[numModels][numSavedData].at<float>(n,0); // (n,0) -> 0 Perque sol te una columna
-                            fourthModel << "\n";
-                        }
-                        if((modelsActivated[numModels]==5) || (numModelsActivated==5)){
-                            fifthModel << modelsLabel[numModels][numSavedData].at<float>(n,0); // (n,0) -> 0 Perque sol te una columna
-                            fifthModel << "\n";
-                        }
-                    }
-                }
-                cout << "Model number "<< numModels+1 << " save as a CSV file" << endl;
-            }else{
-                cout << "No data found in Model number " << numModels+1 << endl;
-            }
-        }
+        saveTrainedData(ann);
+        cout << "[Ann Files Parameters] - Training Data storage process is finished." << endl;
     }
-    if (key == '1'){
-        
-
-        
-        
-    }
-    if (key == '2'){
-        
-        //cout << ann[4]->getWeights(4) << endl;
-        //cout << ann[3]->getWeights(4) << endl;
-        
-    }
-    if (key == '3'){
-        
+    
+    if(key == 'r'){
     }
 }
-
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){

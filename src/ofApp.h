@@ -6,7 +6,12 @@
 #include "SVM.hpp"
 #include "NeuralNetworks.hpp"
 #include "utils.hpp"
+#include <string>
+#include <opencv2/opencv.hpp>
+//#include "ofBaseApp.h"
 
+//#ifndef OFBASEAPP_H
+//#define OFBASEAPP_H
 
 class ofApp : public ofBaseApp{
     
@@ -19,11 +24,8 @@ public:
     ofxOscReceiver receiver;
     ofxOscReceiver receiverRecord;
     
-    ofFile firstModel;
-    ofFile secondModel;
-    ofFile thirdModel;
-    ofFile fourthModel;
-    ofFile fifthModel;
+    ofFile firstModel,secondModel,thirdModel,fourthModel,fifthModel;
+    ofFile firstModelWeights,secondModelWeights,thirdModelWeights,fourthModelWeights,fifthModelWeights;
         
     float peak;
     float freq;
@@ -41,5 +43,10 @@ public:
     void windowResized(int w, int h);
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
+    
+    //bool sortColorFunction (ofColor i,ofColor j);
+    vector<ofImage>loadedImages;
+    vector<ofImage>processedImages;
+    string originalFileExtension;
     
 };
