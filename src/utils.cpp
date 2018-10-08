@@ -94,7 +94,7 @@ void saveDataRecordedToLocalMemory(vector<ofFile> vectorOfFiles,vector<vector<Ma
         String nameModel = "dataModelNumber";
         nameModel = nameModel + std::to_string(numModels);
         nameModel = nameModel + ".csv";
-        path pathname(nameModel);
+        path pathname(nameModel.c_str());
         
         vectorOfFiles[numModels].open(pathname,ofFile::WriteOnly);
         
@@ -132,7 +132,7 @@ void saveTrainedData(vector<Ptr<ANN_MLP>> ann){
         String nameModel = "annParameters";
         nameModel = nameModel + std::to_string(i+1);
         nameModel = nameModel + ".xml";
-        path pathname(nameModel);
+        path pathname(nameModel.c_str());
         
         FileStorage fs;
         fs.open(nameModel, FileStorage::WRITE);
